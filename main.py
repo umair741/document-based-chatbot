@@ -99,6 +99,7 @@ def initialize_chatbot():
             "If the answer is not found in the documents, respond with:\n"
             "Always respond in English, regardless of the input language.\n"
             "'I don't have an answer based on the provided documents.'\n\n"
+            "If the question mentions explain  in Sindhi or Urdu, respond in the same language urdu or sindh. Otherwise, respond in English.\n"
             "Documents:\n{context}\n\n"
             "Chat History:\n{chat_history}\n"
             "User Question: {question}\n\n"

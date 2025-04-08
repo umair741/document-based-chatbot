@@ -5,53 +5,56 @@
   <title>Chat with your DOCX Files</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f4f4f4;
+      background-color: #f8f9fa;
       font-family: 'Arial', sans-serif;
+      color: #212529;
     }
     .container-fluid {
       height: 100vh;
       display: flex;
       overflow: hidden;
     }
-    /* Sidebar Styling */
     .sidebar {
       width: 320px;
       background: #ffffff;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      border-right: 1px solid #ddd;
+      border-right: 1px solid #dee2e6;
       overflow-y: auto;
     }
     .sidebar h3 {
       font-size: 18px;
       margin-bottom: 10px;
-    }
-    .file-list {
-      flex-grow: 1;
-      overflow-y: auto;
-      max-height: 50vh;
+      color: #343a40;
     }
     .file-list .list-group-item {
-      font-size: 14px;
-      padding: 8px 12px;
+      background: #f8f9fa;
+      color: #212529;
+      border: 1px solid #dee2e6;
+      margin-bottom: 5px;
+      transition: 0.3s;
     }
-    /* Chatbox Styling */
+    .file-list .list-group-item:hover {
+      background: #e9ecef;
+    }
     .chat-container {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      background: #fff;
+      background: #ffffff;
       padding: 20px;
     }
     .chat-header {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       text-align: center;
       padding-bottom: 10px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #dee2e6;
+      color: #343a40;
     }
     .chat-messages {
       flex-grow: 1;
@@ -59,6 +62,8 @@
       padding: 20px;
       display: flex;
       flex-direction: column;
+      background: #f8f9fa;
+      border-radius: 8px;
     }
     .chat-message {
       padding: 12px 16px;
@@ -66,6 +71,7 @@
       border-radius: 20px;
       max-width: 75%;
       word-wrap: break-word;
+      font-size: 16px;
     }
     .chat-message.user {
       background-color: #007bff;
@@ -74,30 +80,32 @@
     }
     .chat-message.bot {
       background-color: #e9ecef;
-      color: black;
+      color: #212529;
       align-self: flex-start;
     }
-    /* Chat Input Fixed at Bottom */
     .chat-input-container {
       display: flex;
       padding: 10px;
-      background: white;
-      border-top: 1px solid #ddd;
+      background: #ffffff;
+      border-top: 1px solid #dee2e6;
     }
     .chat-input {
       flex-grow: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      border: 1px solid #ced4da;
       border-radius: 20px;
+      background: #ffffff;
+      color: #212529;
     }
     .send-btn {
       margin-left: 10px;
-      padding: 10px 15px;
+      padding: 12px 15px;
       border-radius: 50%;
       background: #007bff;
       border: none;
       color: white;
       cursor: pointer;
+      transition: 0.3s;
     }
     .send-btn:hover {
       background: #0056b3;
@@ -106,31 +114,24 @@
 </head>
 <body>
   <div class="container-fluid">
-    <!-- Sidebar -->
     <div class="sidebar">
       <form id="upload-form" enctype="multipart/form-data" class="mb-3">
         <input type="file" id="file-input" name="file" accept=".docx" class="form-control mb-2" required>
-        <button type="submit" class="btn btn-secondary w-100">Upload</button>
+        <button type="submit" class="btn btn-primary w-100">Upload</button>
       </form>
       <h3>Your Documents</h3>
-      <ul id="file-list" class="list-group file-list">
-        <!-- Uploaded files will be listed here -->
-      </ul>
+      <ul id="file-list" class="list-group file-list"></ul>
     </div>
-    
-    <!-- Chat Area -->
     <div class="chat-container">
       <div class="chat-header">Chat with your DOCX Files 📄</div>
       <div class="chat-messages" id="chat-messages"></div>
       <div class="chat-input-container">
         <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question..." required>
-        <button id="send-btn" class="send-btn">➤</button>
+        <button id="send-btn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
   </div>
-
   <script>
-    // Fetch existing uploaded files
     function fetchFiles() {
       fetch('/uploaded_files')
         .then(response => response.json())
@@ -148,7 +149,6 @@
     }
     fetchFiles();
 
-    // Handle Chat
     document.getElementById('send-btn').addEventListener('click', sendMessage);
     document.getElementById('chat-input').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') sendMessage();
@@ -171,23 +171,6 @@
       .then(data => addMessage('bot', data.response || 'Error: ' + data.error))
       .catch(error => addMessage('bot', 'Error: ' + error));
     }
-
-    // File Upload
-    document.getElementById('upload-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById('file-input');
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-
-      fetch('/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(() => {
-        fetchFiles(); // Refresh file list after upload
-      });
-    });
 
     function addMessage(sender, text) {
       const chatMessages = document.getElementById('chat-messages');
